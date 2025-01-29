@@ -63,10 +63,11 @@ function createImageElement(src, onClick) {
     return img;
 }
 
-loadImagesBtn.addEventListener('click', async () => {
+async function loadImages() {
     for (let i = 0; i < 2; i++) {
         try {
             const response = await fetch('https://dog.ceo/api/breeds/image/random');
+            if (!response.ok) throw new Error('Помилка сервера');
             const data = await response.json();
             const img = createImageElement(data.message, () => enterFullscreen(images.indexOf(data.message)));
             gallery.appendChild(img);
@@ -74,9 +75,21 @@ loadImagesBtn.addEventListener('click', async () => {
             saveGalleryToLocalStorage();
         } catch (error) {
             console.error('Помилка завантаження фото:', error);
+            alert('Не вдалося завантажити фото. Спробуйте ще раз.');
         }
     }
-});
+}
+
+function saveGalleryToLocalStorage() {
+    try {
+        localStorage.setItem('galleryImages', JSON.stringify(images));
+    } catch (error) {
+        console.error('Помилка збереження в локальне сховище:', error);
+        alert('Не вдалося зберегти галерею.');
+    }
+}
+
+loadImagesBtn.addEventListener('click', loadImages);
 
 function initializeFullscreen(index) {
     currentIndex = index;
@@ -120,10 +133,6 @@ clearGalleryBtn.addEventListener('click', () => {
     localStorage.removeItem('galleryImages');
     gallery.innerHTML = '';
 });
-
-function saveGalleryToLocalStorage() {
-    localStorage.setItem('galleryImages', JSON.stringify(images));
-}
 
 window.addEventListener('load', () => {
     images.forEach(src => {
