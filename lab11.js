@@ -43,9 +43,7 @@ function getLocation() {
             (position) => {
                 const latitude = position.coords.latitude;
                 const longitude = position.coords.longitude;
-                locationDisplay.textContent = `Широта: ${latitude.toFixed(
-                    4
-                )}, Довгота: ${longitude.toFixed(4)}`;
+                locationDisplay.textContent = `Широта: ${latitude.toFixed(4)}, Довгота: ${longitude.toFixed(4)}`;
             },
             (error) => {
                 console.error("Помилка геолокації:", error);
@@ -58,16 +56,21 @@ function getLocation() {
 }
 window.addEventListener("load", getLocation);
 
+function createImageElement(src, onClick) {
+    const img = document.createElement('img');
+    img.src = src;
+    img.addEventListener('click', onClick);
+    return img;
+}
+
 loadImagesBtn.addEventListener('click', async () => {
     for (let i = 0; i < 2; i++) {
         try {
             const response = await fetch('https://dog.ceo/api/breeds/image/random');
             const data = await response.json();
-            const img = document.createElement('img');
-            img.src = data.message;
-            img.addEventListener('click', () => enterFullscreen(images.indexOf(img.src)));
+            const img = createImageElement(data.message, () => enterFullscreen(images.indexOf(data.message)));
             gallery.appendChild(img);
-            images.push(img.src);
+            images.push(data.message);
             saveGalleryToLocalStorage();
         } catch (error) {
             console.error('Помилка завантаження фото:', error);
@@ -80,8 +83,7 @@ function enterFullscreen(index) {
     fullscreenDiv = document.createElement('div');
     fullscreenDiv.classList.add('fullscreen');
 
-    const imgElement = document.createElement('img');
-    imgElement.src = images[currentIndex];
+    const imgElement = createImageElement(images[currentIndex], null);
     const exitBtn = document.createElement('button');
     exitBtn.classList.add('exit-fullscreen');
     exitBtn.textContent = 'Вийти';
@@ -95,10 +97,7 @@ function enterFullscreen(index) {
     nextBtn.textContent = '>';
     nextBtn.addEventListener('click', () => navigateImage(1));
 
-    fullscreenDiv.appendChild(imgElement);
-    fullscreenDiv.appendChild(exitBtn);
-    fullscreenDiv.appendChild(prevBtn);
-    fullscreenDiv.appendChild(nextBtn);
+    fullscreenDiv.append(imgElement, exitBtn, prevBtn, nextBtn);
     document.body.appendChild(fullscreenDiv);
     document.body.style.overflow = 'hidden';
 }
@@ -125,9 +124,7 @@ function saveGalleryToLocalStorage() {
 
 window.addEventListener('load', () => {
     images.forEach(src => {
-        const img = document.createElement('img');
-        img.src = src;
-        img.addEventListener('click', () => enterFullscreen(images.indexOf(img.src)));
+        const img = createImageElement(src, () => enterFullscreen(images.indexOf(src)));
         gallery.appendChild(img);
     });
 });
