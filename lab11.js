@@ -78,28 +78,31 @@ loadImagesBtn.addEventListener('click', async () => {
     }
 });
 
-function enterFullscreen(index) {
+function initializeFullscreen(index) {
     currentIndex = index;
     fullscreenDiv = document.createElement('div');
     fullscreenDiv.classList.add('fullscreen');
 
     const imgElement = createImageElement(images[currentIndex], null);
-    const exitBtn = document.createElement('button');
-    exitBtn.classList.add('exit-fullscreen');
-    exitBtn.textContent = 'Вийти';
-    exitBtn.addEventListener('click', exitFullscreen);
-    const prevBtn = document.createElement('button');
-    prevBtn.classList.add('navigation-btn', 'prev-btn');
-    prevBtn.textContent = '<';
-    prevBtn.addEventListener('click', () => navigateImage(-1));
-    const nextBtn = document.createElement('button');
-    nextBtn.classList.add('navigation-btn', 'next-btn');
-    nextBtn.textContent = '>';
-    nextBtn.addEventListener('click', () => navigateImage(1));
+    const exitBtn = createNavigationButton('Вийти', 'exit-fullscreen', exitFullscreen);
+    const prevBtn = createNavigationButton('<', 'prev-btn', () => navigateImage(-1));
+    const nextBtn = createNavigationButton('>', 'next-btn', () => navigateImage(1));
 
     fullscreenDiv.append(imgElement, exitBtn, prevBtn, nextBtn);
     document.body.appendChild(fullscreenDiv);
     document.body.style.overflow = 'hidden';
+}
+
+function createNavigationButton(text, className, onClick) {
+    const button = document.createElement('button');
+    button.classList.add('navigation-btn', className);
+    button.textContent = text;
+    button.addEventListener('click', onClick);
+    return button;
+}
+
+function enterFullscreen(index) {
+    initializeFullscreen(index);
 }
 
 function exitFullscreen() {
