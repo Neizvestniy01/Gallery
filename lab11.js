@@ -11,32 +11,25 @@ let totalTime = 0;
 let timerInterval;
 let isPageVisible = true;
 const locationDisplay = document.getElementById("location");
-
-function startTimer() {
-    timerInterval = setInterval(() => {
-        if (isPageVisible) {
-            totalTime = Date.now() - startTime;
-            const minutes = Math.floor(totalTime / 60000);
-            const seconds = Math.floor((totalTime % 60000) / 1000);
-            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-        }
-    }, 1000);
+function updateTimer() {
+    totalTime = Date.now() - startTime;
+    const minutes = Math.floor(totalTime / 60000);
+    const seconds = Math.floor((totalTime % 60000) / 1000);
+    timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
-
+function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(updateTimer, 1000);
+}
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-        isPageVisible = false;
+        clearInterval(timerInterval);
     } else {
         startTime = Date.now() - totalTime;
-        isPageVisible = true;
-    }
-});
-window.addEventListener('focus', () => {
-    if (!timerInterval) {
         startTimer();
     }
 });
-
+window.addEventListener('load', startTimer);
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
