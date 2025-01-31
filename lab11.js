@@ -38,24 +38,22 @@ window.addEventListener('focus', () => {
 });
 
 function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-            (position) => {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                locationDisplay.textContent = `Широта: ${latitude.toFixed(4)}, Довгота: ${longitude.toFixed(4)}`;
-            },
-            (error) => {
-                console.error("Помилка геолокації:", error);
-                locationDisplay.textContent = "Не вдалося отримати місцезнаходження.";
-            }
-        );
-    } else {
+    if (!navigator.geolocation) {
         locationDisplay.textContent = "Геолокація не підтримується браузером.";
+        return;
     }
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            locationDisplay.textContent = `Широта: ${latitude.toFixed(4)}, Довгота: ${longitude.toFixed(4)}`;
+        },
+        (error) => {
+            console.error("Помилка геолокації:", error);
+            locationDisplay.textContent = "Не вдалося отримати місцезнаходження.";
+        }
+    );
 }
 window.addEventListener("load", getLocation);
-
 function createImageElement(src, onClick) {
     const img = document.createElement('img');
     img.src = src;
